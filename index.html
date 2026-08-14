@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rastreio BR — Acompanhe sua encomenda</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:    #0D1B2A;
+      --navy-2:  #162236;
+      --blue:    #3B82F6;
+      --blue-d:  #2563EB;
+      --green:   #059669;
+      --amber:   #D97706;
+      --red:     #DC2626;
+      --bg:      #F1F5F9;
+      --card:    #FFFFFF;
+      --border:  #E2E8F0;
+      --text:    #0F172A;
+      --muted:   #64748B;
+      --radius:  14px;
+      --shadow:  0 2px 16px rgba(0,0,0,.07);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--navy);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .logo-stamp {
+      width: 36px;
+      height: 36px;
+      border: 2.5px dashed var(--blue);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      animation: spin-in .8s ease-out forwards;
+    }
+
+    @keyframes spin-in {
+      from { transform: rotate(-180deg) scale(.5); opacity: 0; }
+      to   { transform: rotate(0deg)   scale(1);   opacity: 1; }
+    }
+
+    .logo-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      color: #fff;
+      letter-spacing: -.3px;
+    }
+
+    .logo-name span { color: var(--blue); }
+
+    .header-badge {
+      font-size: 11px;
+      color: var(--muted);
+      background: var(--navy-2);
+      border: 1px solid #1e3050;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--navy);
+      padding: 48px 24px 64px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -1px;
+      line-height: 1.15;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--blue);
+    }
+
+    .hero p {
+      margin-top: 12px;
+      color: #94A3B8;
+      font-size: 16px;
+      max-width: 480px;
+      margin-inline: auto;
+      line-height: 1.6;
+    }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 900px;
+      margin: -32px auto 0;
+      padding: 0 16px 64px;
+    }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 16px;
+      border: none;
+      background: transparent;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s;
+      border-bottom: 3px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .tab-btn.active {
+      color: var(--blue-d);
+      border-bottom-color: var(--blue-d);
+      background: #EFF6FF;
+    }
+
+    .tab-btn:hover:not(.active) {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* ── PANELS ── */
+    .panel {
+      display: none;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 var(--radius) var(--radius);
+      padding: 28px 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel.active { display: block; }
+
+    .panel-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .panel-desc {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* ── FORM ── */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--bg);
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+      background: #fff;
+    }
+
+    input::placeholder { color: #94A3B8; }
+
+    .input-hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
+    /* ── BUTTON ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      border: none;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .18s;
+      width: 100%;
+    }
+
+    .btn-primary {
+      background: var(--blue-d);
+      color: #fff;
+    }
+
+    .btn-primary:hover { background: #1D4ED8; transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { background: #93C5FD; cursor: not-allowed; transform: none; }
+
+    /* ── FEEDBACK ── */
+    .feedback {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .feedback.show { display: flex; align-items: flex-start; gap: 10px; }
+
+    .feedback.success {
+      background: #D1FAE5;
+      color: #065F46;
+      border: 1px solid #A7F3D0;
+    }
+
+    .feedback.error {
+      background: #FEE2E2;
+      color: #991B1B;
+      border: 1px solid #FECACA;
+    }
+
+    .feedback-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── RESULT CARD ── */
+    .result-card {
+      display: none;
+      margin-top: 28px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      animation: slide-up .3s ease-out;
+    }
+
+    @keyframes slide-up {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-card.show { display: block; }
+
+    .result-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .result-code {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: .5px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .badge-delivered   { background: #D1FAE5; color: #065F46; }
+    .badge-monitoring  { background: #DBEAFE; color: #1E40AF; }
+
+    .result-meta {
+      padding: 12px 24px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .meta-item { font-size: 13px; color: var(--muted); }
+    .meta-item strong { color: var(--text); font-weight: 500; }
+
+    /* ── TIMELINE ── */
+    .timeline {
+      padding: 24px;
+    }
+
+    .timeline-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-bottom: 20px;
+    }
+
+    .timeline-list { list-style: none; }
+
+    .timeline-item {
+      display: flex;
+      gap: 16px;
+      padding-bottom: 24px;
+      position: relative;
+      animation: fade-in .3s ease-out both;
+    }
+
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateX(-8px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .timeline-item:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 32px;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+
+    .timeline-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .dot-delivered  { background: #D1FAE5; }
+    .dot-out        { background: #DBEAFE; }
+    .dot-transit    { background: #FEF3C7; }
+    .dot-posted     { background: #F1F5F9; border: 2px solid var(--border); }
+    .dot-latest     { background: #EDE9FE; }
+
+    .timeline-content { flex: 1; padding-top: 4px; }
+
+    .event-desc {
+      font-weight: 500;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .event-detail {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+      font-style: italic;
+    }
+
+    .event-meta {
+      display: flex;
+      gap: 16px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .event-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ── EMPTY ── */
+    .empty-state {
+      text-align: center;
+      padding: 40px 24px;
+      color: var(--muted);
+    }
+
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-text { font-size: 15px; }
+
+    /* ── LOADER ── */
+    .loader {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2.5px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 13px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    footer a { color: var(--blue); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ── NOTICE ── */
+    .notice {
+      background: #FFFBEB;
+      border: 1px solid #FDE68A;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #92400E;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 480px) {
+      .hero { padding: 36px 16px 52px; }
+      .panel { padding: 20px 16px; }
+      .result-header { padding: 16px; }
+      .result-meta { padding: 10px 16px; }
+      .timeline { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="logo" href="#">
+      <div class="logo-stamp">📦</div>
+      <span class="logo-name">Rastreio<em>BR</em></span>
+    </a>
+    <span class="header-badge">API de Rastreamento</span>
+  </header>
+
+  <div class="hero">
+    <h1>Acompanhe sua<br><em>encomenda</em> em tempo real</h1>
+    <p>Cadastre seu código de rastreio e receba atualizações por email automaticamente — até a entrega.</p>
+  </div>
+
+  <main>
+
+    <div class="notice">
+      ⚠️ <span>A primeira requisição pode demorar alguns segundos enquanto o banco de dados acorda. Aguarde!</span>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('register')">
+        📬 Cadastrar rastreio
+      </button>
+      <button class="tab-btn" onclick="switchTab('search')">
+        🔍 Consultar histórico
+      </button>
+    </div>
+
+    <!-- PANEL: REGISTER -->
+    <div class="panel active" id="panel-register">
+      <p class="panel-title">Cadastrar novo rastreio</p>
+      <p class="panel-desc">Informe o código dos Correios e seu email. Você receberá uma notificação sempre que houver uma atualização.</p>
+
+      <div class="form-group">
+        <label for="reg-code">Código de rastreio</label>
+        <input id="reg-code" type="text" placeholder="Ex: AB123456789BR" maxlength="13" autocomplete="off" />
+        <p class="input-hint">Formato: 2 letras + 9 números + BR</p>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-email">Seu email</label>
+        <input id="reg-email" type="email" placeholder="voce@email.com" autocomplete="email" />
+        <p class="input-hint">As notificações serão enviadas para este endereço.</p>
+      </div>
+
+      <button class="btn btn-primary" id="reg-btn" onclick="registerTracking()">
+        Cadastrar e começar a monitorar
+      </button>
+
+      <div class="feedback" id="reg-feedback">
+        <span class="feedback-icon"></span>
+        <span class="feedback-msg"></span>
+      </div>
+
+      <div class="result-card" id="reg-result">
+        <div class="result-header">
+          <span class="result-code" id="reg-result-code"></span>
+          <span class="badge" id="reg-result-badge"></span>
+        </div>
+        <div class="result-meta">
+          <span class="meta-item">📧 <strong id="reg-result-email"></strong></span>
+          <span class="meta-item">📅 Cadastrado em <strong id="reg-result-date"></strong></span>
+        </div>
+        <div class="timeline">
+          <p class="timeline-title">Primeiro evento registrado</p>
+          <ul class="timeline-list" id="reg-timeline"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL: SEARCH -->
+    <div class="panel" id="panel-search">
+      <p class="panel-title">Consultar histórico de rastreio</p>
+      <p class="panel-desc">Informe o código de rastreio para ver todos os eventos registrados até agora.</p>
+
+      <div class="form-group">
+        <label for="search-code">Código de rastreio</label>
+        <input id="search-code" type="text" placeholder="Ex: AB123456789BR" maxlength="13" autocomplete="off" />
+      </div>
+
+      <button class="btn btn-primary" id="search-btn" onclick="searchTracking()">
+        Buscar histórico
+      </button>
+
+      <div class="feedback" id="search-feedback">
+        <span class="feedback-icon"></span>
+        <span class="feedback-msg"></span>
+      </div>
+
+      <div class="result-card" id="search-result">
+        <div class="result-header">
+          <span class="result-code" id="search-result-code"></span>
+          <span class="badge" id="search-result-badge"></span>
+        </div>
+        <div class="result-meta">
+          <span class="meta-item">📧 <strong id="search-result-email"></strong></span>
+          <span class="meta-item">📅 Cadastrado em <strong id="search-result-date"></strong></span>
+          <span class="meta-item">📦 <strong id="search-result-count"></strong></span>
+        </div>
+        <div class="timeline">
+          <p class="timeline-title">Histórico de eventos</p>
+          <ul class="timeline-list" id="search-timeline"></ul>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    Projeto de portfólio —
+    <a href="https://github.com/Daniel20912/tracking-api" target="_blank">GitHub</a> ·
+    <a href="https://tracking-api-pb24.onrender.com/swagger-ui.html" target="_blank">Swagger</a>
+  </footer>
+
+  <script>
+    const API = 'https://tracking-api-pb24.onrender.com';
+
+    // ── TAB SWITCH ──
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach((b, i) => {
+        b.classList.toggle('active', (i === 0) === (tab === 'register'));
+      });
+      document.getElementById('panel-register').classList.toggle('active', tab === 'register');
+      document.getElementById('panel-search').classList.toggle('active', tab === 'search');
+    }
+
+    // ── FEEDBACK HELPERS ──
+    function showFeedback(prefix, type, message) {
+      const el = document.getElementById(`${prefix}-feedback`);
+      const icon = el.querySelector('.feedback-icon');
+      const msg  = el.querySelector('.feedback-msg');
+      el.className = `feedback show ${type}`;
+      icon.textContent = type === 'success' ? '✅' : '❌';
+      msg.textContent = message;
+    }
+
+    function clearFeedback(prefix) {
+      const el = document.getElementById(`${prefix}-feedback`);
+      el.className = 'feedback';
+    }
+
+    function setLoading(prefix, loading) {
+      const btn = document.getElementById(`${prefix}-btn`);
+      if (loading) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loader"></span> Aguarde...';
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = prefix === 'reg'
+          ? 'Cadastrar e começar a monitorar'
+          : 'Buscar histórico';
+      }
+    }
+
+    // ── DATE FORMAT ──
+    function formatDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      return d.toLocaleString('pt-BR', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    // ── EVENT DOT ──
+    function dotClass(code) {
+      if (!code) return 'dot-posted';
+      const c = code.toUpperCase();
+      if (c === 'BDE') return 'dot-delivered';
+      if (c === 'OEC') return 'dot-out';
+      if (['RO', 'FC', 'BDI', 'TRI', 'LDI'].includes(c)) return 'dot-transit';
+      return 'dot-posted';
+    }
+
+    function dotEmoji(code) {
+      if (!code) return '📦';
+      const c = code.toUpperCase();
+      if (c === 'BDE') return '✅';
+      if (c === 'OEC') return '🚚';
+      if (['RO', 'FC', 'BDI', 'TRI', 'LDI'].includes(c)) return '🔄';
+      return '📦';
+    }
+
+    // ── BUILD TIMELINE ──
+    function buildTimeline(events, containerId, highlightLast = false) {
+      const list = document.getElementById(containerId);
+      list.innerHTML = '';
+
+      if (!events || events.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <p class="empty-text">Nenhum evento registrado ainda.</p>
+          </div>`;
+        return;
+      }
+
+      events.forEach((ev, i) => {
+        const isLast = i === events.length - 1;
+        const li = document.createElement('li');
+        li.className = 'timeline-item';
+        li.style.animationDelay = `${i * 60}ms`;
+
+        const dc = highlightLast && isLast ? 'dot-latest' : dotClass(ev.code);
+        const emoji = dotEmoji(ev.code);
+
+        li.innerHTML = `
+          <div class="timeline-dot ${dc}">${emoji}</div>
+          <div class="timeline-content">
+            <p class="event-desc">${ev.description || '—'}</p>
+            ${ev.details ? `<p class="event-detail">${ev.details}</p>` : ''}
+            <div class="event-meta">
+              ${ev.location ? `<span class="event-tag">📍 ${ev.location}</span>` : ''}
+              ${ev.dateEvent ? `<span class="event-tag">🕐 ${formatDate(ev.dateEvent)}</span>` : ''}
+            </div>
+          </div>`;
+        list.appendChild(li);
+      });
+    }
+
+    // ── BADGE ──
+    function buildBadge(delivered) {
+      return delivered
+        ? `<span class="badge badge-delivered">✅ Entregue</span>`
+        : `<span class="badge badge-monitoring">🔵 Monitorando</span>`;
+    }
+
+    // ── REGISTER ──
+    async function registerTracking() {
+      const code  = document.getElementById('reg-code').value.trim().toUpperCase();
+      const email = document.getElementById('reg-email').value.trim();
+
+      clearFeedback('reg');
+      document.getElementById('reg-result').classList.remove('show');
+
+      if (!code || !email) {
+        showFeedback('reg', 'error', 'Preencha o código de rastreio e o email.');
+        return;
+      }
+
+      setLoading('reg', true);
+
+      try {
+        const res = await fetch(`${API}/tracking-api`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, email })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showFeedback('reg', 'error', data.message || 'Erro ao cadastrar rastreio.');
+          return;
+        }
+
+        // Preencher result card
+        document.getElementById('reg-result-code').textContent  = data.code;
+        document.getElementById('reg-result-badge').outerHTML =
+          `<span class="badge ${data.delivered ? 'badge-delivered' : 'badge-monitoring'}" id="reg-result-badge">${data.delivered ? '✅ Entregue' : '🔵 Monitorando'}</span>`;
+        document.getElementById('reg-result-email').textContent = data.email;
+        document.getElementById('reg-result-date').textContent  = formatDate(data.createdAt);
+
+        buildTimeline(data.events, 'reg-timeline', true);
+        document.getElementById('reg-result').classList.add('show');
+
+        showFeedback('reg', 'success', 'Rastreio cadastrado! Você receberá emails a cada atualização.');
+
+      } catch (e) {
+        showFeedback('reg', 'error', 'Não foi possível conectar à API. Tente novamente em alguns segundos.');
+      } finally {
+        setLoading('reg', false);
+      }
+    }
+
+    // ── SEARCH ──
+    async function searchTracking() {
+      const code = document.getElementById('search-code').value.trim().toUpperCase();
+
+      clearFeedback('search');
+      document.getElementById('search-result').classList.remove('show');
+
+      if (!code) {
+        showFeedback('search', 'error', 'Informe o código de rastreio.');
+        return;
+      }
+
+      setLoading('search', true);
+
+      try {
+        const res  = await fetch(`${API}/tracking-api/findByCode/${encodeURIComponent(code)}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+          showFeedback('search', 'error', data.message || 'Rastreio não encontrado.');
+          return;
+        }
+
+        document.getElementById('search-result-code').textContent  = data.code;
+        document.getElementById('search-result-badge').outerHTML =
+          `<span class="badge ${data.delivered ? 'badge-delivered' : 'badge-monitoring'}" id="search-result-badge">${data.delivered ? '✅ Entregue' : '🔵 Monitorando'}</span>`;
+        document.getElementById('search-result-email').textContent = data.email;
+        document.getElementById('search-result-date').textContent  = formatDate(data.createdAt);
+
+        const count = data.events ? data.events.length : 0;
+        document.getElementById('search-result-count').textContent =
+          `${count} evento${count !== 1 ? 's' : ''} registrado${count !== 1 ? 's' : ''}`;
+
+        buildTimeline(data.events, 'search-timeline');
+        document.getElementById('search-result').classList.add('show');
+
+      } catch (e) {
+        showFeedback('search', 'error', 'Não foi possível conectar à API. Tente novamente em alguns segundos.');
+      } finally {
+        setLoading('search', false);
+      }
+    }
+
+    // ── ENTER KEY ──
+    document.getElementById('reg-email').addEventListener('keydown', e => { if (e.key === 'Enter') registerTracking(); });
+    document.getElementById('reg-code').addEventListener('keydown',  e => { if (e.key === 'Enter') registerTracking(); });
+    document.getElementById('search-code').addEventListener('keydown', e => { if (e.key === 'Enter') searchTracking(); });
+  </script>
+</body>
+</html>
