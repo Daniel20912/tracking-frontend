@@ -559,7 +559,7 @@
           <span class="meta-item">📅 Cadastrado em <strong id="reg-result-date"></strong></span>
         </div>
         <div class="timeline">
-          <p class="timeline-title">Primeiro evento registrado</p>
+          <p class="timeline-title">Histórico de eventos</p>
           <ul class="timeline-list" id="reg-timeline"></ul>
         </div>
       </div>
@@ -758,7 +758,7 @@
         document.getElementById('reg-result-badge').outerHTML =
           `<span class="badge ${data.delivered ? 'badge-delivered' : 'badge-monitoring'}" id="reg-result-badge">${data.delivered ? '✅ Entregue' : '🔵 Monitorando'}</span>`;
         document.getElementById('reg-result-email').textContent = data.email;
-        document.getElementById('reg-result-date').textContent  = formatDate(data.createdAt);
+        document.getElementById('reg-result-date').textContent  = formatDate(data.createdAt ?? data.date);
 
         buildTimeline(data.events, 'reg-timeline', true);
         document.getElementById('reg-result').classList.add('show');
@@ -799,7 +799,7 @@
         document.getElementById('search-result-badge').outerHTML =
           `<span class="badge ${data.delivered ? 'badge-delivered' : 'badge-monitoring'}" id="search-result-badge">${data.delivered ? '✅ Entregue' : '🔵 Monitorando'}</span>`;
         document.getElementById('search-result-email').textContent = data.email;
-        document.getElementById('search-result-date').textContent  = formatDate(data.createdAt);
+        document.getElementById('search-result-date').textContent  = formatDate(data.createdAt ?? data.date);
 
         const count = data.events ? data.events.length : 0;
         document.getElementById('search-result-count').textContent =
